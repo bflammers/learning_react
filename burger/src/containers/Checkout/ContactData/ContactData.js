@@ -6,6 +6,8 @@ import { withRouter } from 'react-router-dom'
 import axios from '../../../axios-db'
 import Input from '../../../components/UI/Input/Input'
 
+import { connect } from 'react-redux'
+
 
 const fieldConfig = (type, config_type, placeholder, value) => (
     {
@@ -92,4 +94,11 @@ const ContactData = (props) => {
 
 }
 
-export default withRouter(ContactData)
+const mapStateToProps = state => {
+    return {
+        ingredients: state.burger.ingredients,
+        price: state.burger.price
+    }
+}
+
+export default connect(mapStateToProps)(withRouter(ContactData))

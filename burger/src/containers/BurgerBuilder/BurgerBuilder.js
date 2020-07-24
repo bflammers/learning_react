@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import axios, {login} from '../../axios-db'
+import React, { useState, useEffect, useMemo } from 'react'
+import axios from '../../axios-db'
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
 
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
@@ -10,65 +9,25 @@ import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
-
-const calcPrice = (ingredients) => {
-
-    const INGREDIENT_PRICES = {
-        salad: 0.5, 
-        bacon: 1, 
-        meat: 2, 
-        cheese: 1
-    }
-
-    return Object.keys(ingredients).reduce((p, c) => {
-        return p + ingredients[c] * INGREDIENT_PRICES[c]
-    }, 0)
-}
+import { connect } from 'react-redux'
+import { addIngredient, delIngredient } from '../../store/actions/burger_builder'
+import { getToken, testConnection } from '../../store/actions/auth' 
 
 const BurgerBuilder = (props) => {
 
-    const [ingredients, setIngredients] = useState({
-        salad: 0, 
-        bacon: 0, 
-        cheese: 0, 
-        meat: 0,
-    })
-
-    const [price, setPrice] = useState(0)
     const [purchasable, setPurchasable] = useState(false)
     const [purchasing, setPurchasing] = useState(false)
     const [submittingOrder, setSubmittingOrder] = useState(false)
 
-    const handleLessIngredient = (type) => {
-        const newIngredients = {...ingredients}
-        newIngredients[type] = Math.max(0, ingredients[type] - 1)
-        setIngredients(newIngredients)
-        updatePrice(newIngredients)
-        updatePurchasable(newIngredients)
-    }
-
-    const handleMoreIngredient = (type) => {
-        const newIngredients = {...ingredients}
-        newIngredients[type] = ingredients[type] + 1
-        setIngredients(newIngredients)
-        updatePrice(newIngredients)
-        updatePurchasable(newIngredients)
-    }
-
-    const updatePrice = (ingredients) => {
-        const newPrice = calcPrice(ingredients)
-        setPrice(newPrice)
-    }
-
-    const updatePurchasable = (ingredients) => {
-        const allCounts = Object.values(ingredients)
+    useEffect(() => {
+        const allCounts = Object.values(props.ingredients)
         const nIngredients = allCounts.reduce((a, b) => a + b, 0)
         setPurchasable(nIngredients > 0)
-    }
+    }, [props.ingredients])
 
-    const disabledInfo = {...ingredients}
-    for (const key in ingredients) {
-        disabledInfo[key] = ingredients[key] <= 0
+    const disabledInfo = {...props.ingredients}
+    for (const key in props.ingredients) {
+        disabledInfo[key] = props.ingredients[key] <= 0
     }
 
     const purchaseHandler = () => {
@@ -84,8 +43,8 @@ const BurgerBuilder = (props) => {
         setSubmittingOrder(true)
         
         const queryParams = []
-        for (let i in ingredients) {
-            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(ingredients[i]))
+        for (let i in props.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(props.ingredients[i]))
         }
         props.history.push({
             pathname: '/checkout', 
@@ -96,8 +55,8 @@ const BurgerBuilder = (props) => {
     const memoOrderSummary = useMemo(() => {
         
         let orderSummary = <OrderSummary 
-            ingredients={ingredients}
-            price={price}
+            ingredients={props.ingredients}
+            price={props.price}
             cancel={purchaseCancelHandler}
             continue={purchaseContinueHandler}/>
         
@@ -122,21 +81,36 @@ const BurgerBuilder = (props) => {
     return (
         <React.Fragment>
             {memoOrderSummary}
-            <Burger ingredients={ingredients}/>
+            <Burger ingredients={props.ingredients}/>
             <BuildControls 
-                ingredients={ingredients} 
-                addIngredient={handleMoreIngredient}
-                removeIngredient={handleLessIngredient}
+                ingredients={props.ingredients} 
+                addIngredient={props.addIngredient}
+                removeIngredient={props.delIngredient}
                 disabled={disabledInfo}
-                price={price}
+                price={props.price}
                 purchasable={purchasable}
                 purchase={purchaseHandler}/>
             <div style={{textAlign: 'center', marginTop: '10px'}}>
-                <Button variant="contained" color="secondary" onClick={login}>Login</Button>
+                <Button variant="contained" color="secondary" onClick={props.login}>Login</Button>
+                <Button variant="contained" color="primary" onClick={testConnection}>Test connection</Button>
             </div>
         </React.Fragment>
     )
 }
 
-export { calcPrice }
-export default withErrorHandler(BurgerBuilder, axios)
+const mapStateToProps = state => {
+    return {
+        ingredients: state.burger.ingredients,
+        price: state.burger.price
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: () => dispatch( getToken('bartlammers', 'bartlammers') ),
+        addIngredient: (ingr) => dispatch( addIngredient(ingr) ),
+        delIngredient: (ingr) => dispatch( delIngredient(ingr) )
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(BurgerBuilder, axios))

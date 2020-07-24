@@ -3,24 +3,21 @@ import Order from '../../components/Order/Order'
 import CircularProgress from '@material-ui/core/CircularProgress'; 
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import axios from '../../axios-db'
+import { connect } from 'react-redux'
+import { getOrders } from '../../store/actions/index'
 
 const Orders = (props) => {
 
-    const [MyOrders, setMyOrders] = useState([])
     const [loading, setLoading] = useState(true)    
 
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/db/clients/2/get_orders/')
-            .then(response => {
-                setMyOrders(response.data['orders'])
-                setLoading(false)
-            })
-            .catch(err => {
-                setLoading(false)
-            })
-    }, [])
+        props.getOrders()
+        if (props.auth) {
+            setLoading(false)
+        }
+    }, [props.auth])
 
-    let orderList = MyOrders.map(order => (
+    let orderList = props.orders.map(order => (
         <Order key={order.order_id} details={order}/>
     ))
 
@@ -29,10 +26,23 @@ const Orders = (props) => {
     }
     
     return (
-        <div>
+        <div style={{width: '20px', margin: '200px auto'}}>
             {orderList}
         </div>
     )
 }
 
-export default withErrorHandler(Orders, axios)
+const mapStateToProps = state => {
+    return {
+        auth: state.auth.authenticated,
+        orders: state.orders.orders
+    }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getOrders: () => dispatch(getOrders())
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Orders, axios))
