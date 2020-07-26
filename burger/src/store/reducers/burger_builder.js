@@ -1,5 +1,5 @@
 
-import * as burgerActionTypes from '../actions/burger_builder'
+import * as burgerActionTypes from '../action_types/burger_builder'
 import { calcPrice } from '../../utils/ingredients'
 
 const initialState = {

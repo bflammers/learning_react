@@ -1,5 +1,5 @@
 
-import * as actionTypes from '../actions'
+import * as resultActions from '../actions/result'
 
 const initialState = {
     result_list: []
@@ -7,14 +7,12 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.STORE:
+        case resultActions.STORE_COUNT:
             return {
                 ...state, 
                 result_list: state.result_list.concat(action.count)
             }
-        case actionTypes.DELETE:
-            // const new_del_result_list = [...state.result_list]
-            // new_del_result_list.splice(action.index, 1)
+        case resultActions.DELETE_COUNT:
             return {
                 ...state, 
                 result_list: state.result_list.filter((_, index) => index !== action.index)

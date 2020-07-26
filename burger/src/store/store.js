@@ -1,5 +1,5 @@
 
-import { createStore, combineReducers, applyMiddleware } from 'redux'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 
 import { burgerReducer, authReducer, ordersReducer } from './reducers/index'
@@ -23,6 +23,9 @@ const reducer = combineReducers({
   orders: ordersReducer
 })
 
-const store = createStore(reducer, applyMiddleware(logger, thunk))
+// Needed for Reduc debug tools in Chrome
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const store = createStore(reducer, composeEnhancers(applyMiddleware(logger, thunk)))
 
 export default store

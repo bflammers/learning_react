@@ -22,11 +22,15 @@ const Orders = (props) => {
     ))
 
     if ( loading ) {
-        orderList = <CircularProgress/>
+        orderList = (
+            <div style={{margin: '200px auto', textAlign: 'center'}}>
+                <CircularProgress/>
+            </div>
+        )
     }
     
     return (
-        <div style={{width: '20px', margin: '200px auto'}}>
+        <div style={{width: '70%', margin: '0 auto'}}>
             {orderList}
         </div>
     )
