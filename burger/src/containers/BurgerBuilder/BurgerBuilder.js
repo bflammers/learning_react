@@ -11,7 +11,7 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 import { connect } from 'react-redux'
 import { addIngredient, delIngredient } from '../../store/actions/burger_builder'
-import { getToken, testConnection } from '../../store/actions/auth' 
+import { login, testConnection } from '../../store/actions/auth' 
 
 const BurgerBuilder = (props) => {
 
@@ -107,7 +107,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        login: () => dispatch( getToken('bartlammers', 'bartlammers') ),
+        login: () => dispatch( login('bartlammers', 'bartlammers') ),
         addIngredient: (ingr) => dispatch( addIngredient(ingr) ),
         delIngredient: (ingr) => dispatch( delIngredient(ingr) )
     }

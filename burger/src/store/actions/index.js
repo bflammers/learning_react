@@ -1,8 +1,8 @@
 
 export {
-    setAuthenticated, 
-    storeToken,
-    getToken
+    testConnection,
+    login, 
+    logout
 } from './auth'
 
 export {

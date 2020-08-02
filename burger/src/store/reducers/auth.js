@@ -1,30 +1,54 @@
+/* eslint-disable no-fallthrough */
 
 import * as authActionTypes from '../action_types/auth'
 
+
 const initialState = {
-    authenticated: false,
-    token: null
+    submitting: false,
+    token: null, 
+    loginFailed: false
+}
+
+const authStart = (state) => {
+    return {
+        ...state, 
+        submitting: true, 
+        loginFailed: false
+    }
+}
+
+const authSuccess = (state, action) => {
+    return {
+        submitting: false,
+        token: action.token, 
+        loginFailed: false
+    }
+}
+
+const authFail = (state, action) => {
+    return {
+        ...state,
+        submitting: false, 
+        loginFailed: true
+    }
+}
+
+const logout = (state, action) => {
+    return {
+        ...state,
+        token: null
+    }
 }
 
 const authReducer = (state = initialState, action) => {
     switch (action.type) {
-        case authActionTypes.SET_AUTHENTICATED:
-            return {
-                ...state, 
-                authenticated: action.auth
-            }
-        case authActionTypes.STORE_TOKEN:
-            return {
-                ...state, 
-                token: action.token
-            }
-        case authActionTypes.REMOVE_TOKEN:
-            return {
-                ...state, 
-                token: null
-            }
+        case authActionTypes.AUTH_START: return authStart(state)
+        case authActionTypes.AUTH_SUCCESS: return authSuccess(state, action)
+        case authActionTypes.AUTH_FAIL: return authFail(state, action)
+        case authActionTypes.LOGOUT: return logout(state, action)
+        default: 
+            return state
     }
-    return state
 }
 
 export default authReducer

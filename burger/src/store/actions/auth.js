@@ -2,43 +2,48 @@
 import * as authActionTypes from '../action_types/auth'
 import axios from '../../axios-db'
 
-export const setAuthenticated = (auth) => {
+export const authStart = () => {
     return {
-        type: authActionTypes.SET_AUTHENTICATED,
-        auth: auth
+        type: authActionTypes.AUTH_START
     }
 }
 
-export const storeToken = (token) => {
+export const authSuccess = (token) => {
     return {
-        type: authActionTypes.STORE_TOKEN,
+        type: authActionTypes.AUTH_SUCCESS,
         token: token
     }
 }
 
-export const getToken = (username, password) => {
+export const authFail = (error) => {
+    return {
+        type: authActionTypes.AUTH_FAIL,
+        token: error
+    }
+}
+
+export const login = (username, password) => {
     return dispatch => {
-        console.log('Sending request to auth')
+        dispatch(authStart())
         axios.post('http://127.0.0.1:8000/auth/', {
             username: username, 
             password: password
         }).then(response => {
-            dispatch(storeToken(response.data.token))
-            dispatch(setAuthenticated(true))
             axios.addInterceptor(response.data.token)
-            console.log('Login succesful, username: ', JSON.parse(response.config.data)['username'])
+            dispatch(authSuccess(response.data.token))
+        }).catch(err => {
+            dispatch(authFail(err))
         })
     }
 }
 
-export const testConnection = () => {
+export const logout = () => {
+    return {
+        type: authActionTypes.LOGOUT
+    }
+}
 
-    // let config = {
-    //     headers: {
-    //         Authorization: 'Token ' + store.getState().auth.token
-    //     }
-    // }
-    // console.log(config)
+export const testConnection = () => {
 
     axios.get('/clients/2/get_orders/')
         .then(response => {

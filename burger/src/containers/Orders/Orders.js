@@ -38,7 +38,7 @@ const Orders = (props) => {
 
 const mapStateToProps = state => {
     return {
-        auth: state.auth.authenticated,
+        auth: state.auth.token !== null,
         orders: state.orders.orders
     }
 }
