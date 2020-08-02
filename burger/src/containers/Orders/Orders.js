@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Order from '../../components/Order/Order'
-import CircularProgress from '@material-ui/core/CircularProgress'; 
+import CircularProgress from '@material-ui/core/CircularProgress';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import axios from '../../axios-db'
 import { connect } from 'react-redux'
@@ -8,29 +8,25 @@ import { getOrders } from '../../store/actions/index'
 
 const Orders = (props) => {
 
-    const [loading, setLoading] = useState(true)    
-
     useEffect(() => {
         props.getOrders()
-        if (props.auth) {
-            setLoading(false)
-        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.auth])
 
     let orderList = props.orders.map(order => (
-        <Order key={order.order_id} details={order}/>
+        <Order key={order.order_id} details={order} />
     ))
 
-    if ( loading ) {
+    if (props.loading) {
         orderList = (
-            <div style={{margin: '200px auto', textAlign: 'center'}}>
-                <CircularProgress/>
+            <div style={{ margin: '200px auto', textAlign: 'center' }}>
+                <CircularProgress />
             </div>
         )
     }
-    
+
     return (
-        <div style={{width: '70%', margin: '0 auto'}}>
+        <div style={{ width: '70%', margin: '0 auto' }}>
             {orderList}
         </div>
     )
@@ -39,7 +35,9 @@ const Orders = (props) => {
 const mapStateToProps = state => {
     return {
         auth: state.auth.token !== null,
-        orders: state.orders.orders
+        orders: state.orders.orders,
+        loading: state.orders.loading,
+        loadingError: state.orders.loadingError
     }
 }
 

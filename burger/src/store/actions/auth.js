@@ -45,7 +45,7 @@ export const logout = () => {
 
 export const testConnection = () => {
 
-    axios.get('/clients/2/get_orders/')
+    axios.get('orders/')
         .then(response => {
             if (response.status === 200) {
                 console.log('CONNECTION OK')

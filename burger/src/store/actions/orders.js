@@ -1,28 +1,41 @@
 
 import axios from '../../axios-db'
 
-import * as ordersActionTypes from '../action_types/orders' 
-import store from '../store'
+import * as ordersActionTypes from '../action_types/orders'
 
-export const storeOrders = orders => {
+
+const getOrdersStart = () => {
     return {
-        type: ordersActionTypes.STORE_ORDERS,
+        type: ordersActionTypes.GET_ORDERS_START
+    }
+}
+
+const getOrdersSuccess = (orders) => {
+    return {
+        type: ordersActionTypes.GET_ORDERS_SUCCESS,
         orders: orders
     }
 }
 
+const getOrdersFail = (error) => {
+    console.log('[actions/orders.js] Get orders failed', error)
+    return {
+        type: ordersActionTypes.GET_ORDERS_FAIL,
+        error: error
+    }
+}
+
 export const getOrders = () => {
-
-    // let config = {
-    //     headers: {
-    //         Authorization: 'Token ' + props.token
-    //     }
-    // }
-
     return dispatch => {
-        axios.get('/clients/2/get_orders/')
-            .then(response => {
-                dispatch(storeOrders(response.data['orders']))
-            })
-        }
+        dispatch(getOrdersStart())
+        setTimeout(() => {
+            axios.get('/clients/2/get_orders/')
+                .then(response => {
+                    dispatch(getOrdersSuccess(response.data['orders']))
+                })
+                .catch(error => {
+                    dispatch(getOrdersFail(error))
+                })
+        }, 0)
+    }
 }
